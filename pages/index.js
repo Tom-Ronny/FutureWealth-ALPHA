@@ -2,95 +2,78 @@ import { supabase } from '../lib/supabaseClient'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
-  // User ID - BYTT til din user uuid
-  const userId = 'c1b397fd-009e-4e68-92bc-30b42c0849d4'
+  const userId = 'YOUR_USER_UUID_HERE'
 
-  // STATES for visning av data
+  // STATES for data
   const [incomeData, setIncomeData] = useState([])
   const [savingsData, setSavingsData] = useState([])
   const [pensionsData, setPensionsData] = useState([])
   const [simulationsData, setSimulationsData] = useState([])
 
-  const [simulationRunning, setSimulationRunning] = useState(false)
-
-  // STATES for Income form
+  // STATES for forms
   const [monthlyIncome, setMonthlyIncome] = useState('')
   const [incomeStartDate, setIncomeStartDate] = useState('')
   const [incomeEndDate, setIncomeEndDate] = useState('')
 
-  // STATES for Savings form
   const [savingType, setSavingType] = useState('')
   const [monthlyAmount, setMonthlyAmount] = useState('')
   const [savingStartDate, setSavingStartDate] = useState('')
   const [savingEndDate, setSavingEndDate] = useState('')
 
-  // STATES for Pensions form
   const [pensionType, setPensionType] = useState('')
   const [annualAmount, setAnnualAmount] = useState('')
   const [startAge, setStartAge] = useState('')
   const [endAge, setEndAge] = useState('')
 
-  // FETCH Income
+  // Simulation
+  const [simulationRunning, setSimulationRunning] = useState(false)
+  const [returnRate, setReturnRate] = useState(5)
+  const [inflationRate, setInflationRate] = useState(2)
+
+  // FETCH data
   useEffect(() => {
     async function fetchIncome() {
       let { data, error } = await supabase
         .from('income')
         .select('*')
         .eq('user_id', userId)
-
       if (error) console.error('Error fetching income:', error)
       else setIncomeData(data)
     }
 
-    fetchIncome()
-  }, [])
-
-  // FETCH Savings
-  useEffect(() => {
     async function fetchSavings() {
       let { data, error } = await supabase
         .from('savings')
         .select('*')
         .eq('user_id', userId)
-
       if (error) console.error('Error fetching savings:', error)
       else setSavingsData(data)
     }
 
-    fetchSavings()
-  }, [])
-
-  // FETCH Pensions
-  useEffect(() => {
     async function fetchPensions() {
       let { data, error } = await supabase
         .from('pensions')
         .select('*')
         .eq('user_id', userId)
-
       if (error) console.error('Error fetching pensions:', error)
       else setPensionsData(data)
     }
 
-    fetchPensions()
-  }, [])
-
-  // FETCH Simulations
-  useEffect(() => {
     async function fetchSimulations() {
       let { data, error } = await supabase
         .from('simulations')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
-
       if (error) console.error('Error fetching simulations:', error)
       else setSimulationsData(data)
     }
 
+    fetchIncome()
+    fetchSavings()
+    fetchPensions()
     fetchSimulations()
   }, [])
-
   // HANDLE Income submit
   const handleIncomeSubmit = async (e) => {
     e.preventDefault()
@@ -153,14 +136,14 @@ export default function Home() {
     }
   }
 
-  // HANDLE Run Simulation (calls API)
+  // HANDLE Run Simulation (with inputs)
   const handleRunSimulation = async () => {
     setSimulationRunning(true)
 
     const userInputs = {
       userId,
-      returnRate: 5, // Can be dynamic input later
-      inflationRate: 2,
+      returnRate: parseFloat(returnRate),
+      inflationRate: parseFloat(inflationRate),
       currentAge: 40,
       pensionAge: 67,
       endAge: 90,
@@ -187,6 +170,7 @@ export default function Home() {
     setSimulationRunning(false)
   }
 
+  // RETURN UI
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Hello, FutureWealth-ALPHA!</h1>
@@ -307,9 +291,27 @@ export default function Home() {
 
       {/* Run Simulation */}
       <h2>🚀 Run Simulation</h2>
+      <label>Return Rate (%): </label>
+      <input
+        type="number"
+        value={returnRate}
+        onChange={(e) => setReturnRate(e.target.value)}
+        step="0.1"
+      />
+      <br />
+      <label>Inflation Rate (%): </label>
+      <input
+        type="number"
+        value={inflationRate}
+        onChange={(e) => setInflationRate(e.target.value)}
+        step="0.1"
+      />
+      <br />
       <button onClick={handleRunSimulation} disabled={simulationRunning}>
         {simulationRunning ? 'Running...' : 'Run Simulation'}
       </button>
+
+      <hr />
 
       <h2>📊 Simulations History</h2>
       <h3>Simulations Records:</h3>

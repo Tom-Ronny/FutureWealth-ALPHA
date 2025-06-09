@@ -8,7 +8,7 @@ export default function Home() {
   useEffect(() => {
     async function fetchData() {
       let { data, error } = await supabase
-        .from('YOUR_TABLE_NAME')  // <-- BYTT UT MED DIN TABELL!
+        .from('users')  // <-- BYTT UT MED DIN TABELL!
         .select('*')
 
       if (error) {

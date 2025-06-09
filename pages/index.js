@@ -338,6 +338,38 @@ export default function Home() {
 
       <h2>📊 Simulations History</h2>
 
+{simulationsData.length > 0 && (
+  <div>
+    <h3>Capital Over Time (Last Simulation):</h3>
+    <Line
+      data={{
+        labels: Object.keys(simulationsData[0].result_json.capitalByYear),
+        datasets: [
+          {
+            label: 'Capital',
+            data: Object.values(simulationsData[0].result_json.capitalByYear),
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            fill: true,
+            tension: 0.3,
+          },
+        ],
+      }}
+      options={{
+        responsive: true,
+        plugins: {
+          legend: { position: 'top' },
+          title: { display: true, text: 'Capital Build-up Until Retirement' },
+        },
+      }}
+    />
+  </div>
+)}
+
+
+
+
+
       {simulationsData.length > 0 && (
         <div>
           <h3>Capital Over Time (Last Simulation):</h3>

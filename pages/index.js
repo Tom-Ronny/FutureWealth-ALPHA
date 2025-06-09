@@ -11,6 +11,8 @@ export default function Home() {
   const [pensionsData, setPensionsData] = useState([])
   const [simulationsData, setSimulationsData] = useState([])
 
+  const [simulationRunning, setSimulationRunning] = useState(false)
+
   // STATES for Income form
   const [monthlyIncome, setMonthlyIncome] = useState('')
   const [incomeStartDate, setIncomeStartDate] = useState('')
@@ -151,6 +153,40 @@ export default function Home() {
     }
   }
 
+  // HANDLE Run Simulation (calls API)
+  const handleRunSimulation = async () => {
+    setSimulationRunning(true)
+
+    const userInputs = {
+      userId,
+      returnRate: 5, // Can be dynamic input later
+      inflationRate: 2,
+      currentAge: 40,
+      pensionAge: 67,
+      endAge: 90,
+    }
+
+    const response = await fetch('/api/simulate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userInputs),
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      console.log('Simulation result:', data)
+      alert('Simulation completed and saved!')
+      window.location.reload()
+    } else {
+      console.error('Simulation failed')
+      alert('Simulation failed')
+    }
+
+    setSimulationRunning(false)
+  }
+
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Hello, FutureWealth-ALPHA!</h1>
@@ -269,7 +305,12 @@ export default function Home() {
 
       <hr />
 
-      {/* Simulations */}
+      {/* Run Simulation */}
+      <h2>🚀 Run Simulation</h2>
+      <button onClick={handleRunSimulation} disabled={simulationRunning}>
+        {simulationRunning ? 'Running...' : 'Run Simulation'}
+      </button>
+
       <h2>📊 Simulations History</h2>
       <h3>Simulations Records:</h3>
       <pre>{JSON.stringify(simulationsData, null, 2)}</pre>

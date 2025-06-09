@@ -18,7 +18,7 @@ export default function Home() {
   const [savingEndDate, setSavingEndDate] = useState('')
 
   // Bruker-id (BYTT UT med din user UUID fra users-tabellen)
-  const userId = 'Tom-Ronny'
+  const userId = 'c1b397fd-009e-4e68-92bc-30b42c0849d4'
 
   // Fetch income
   useEffect(() => {

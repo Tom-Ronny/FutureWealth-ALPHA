@@ -24,15 +24,13 @@ ChartJS.register(
 )
 
 export default function Home() {
-  const userId = 'c1b397fd-009e-4e68-92bc-30b42c0849d4'
+  const userId = 'YOUR_USER_UUID_HERE'
 
-  // STATES for data
   const [incomeData, setIncomeData] = useState([])
   const [savingsData, setSavingsData] = useState([])
   const [pensionsData, setPensionsData] = useState([])
   const [simulationsData, setSimulationsData] = useState([])
 
-  // STATES for forms
   const [monthlyIncome, setMonthlyIncome] = useState('')
   const [incomeStartDate, setIncomeStartDate] = useState('')
   const [incomeEndDate, setIncomeEndDate] = useState('')
@@ -47,12 +45,10 @@ export default function Home() {
   const [startAge, setStartAge] = useState('')
   const [endAge, setEndAge] = useState('')
 
-  // Simulation
   const [simulationRunning, setSimulationRunning] = useState(false)
   const [returnRate, setReturnRate] = useState(5)
   const [inflationRate, setInflationRate] = useState(2)
 
-  // FETCH data
   useEffect(() => {
     async function fetchIncome() {
       let { data, error } = await supabase
@@ -97,7 +93,6 @@ export default function Home() {
     fetchSimulations()
   }, [])
 
-  // HANDLE Income submit
   const handleIncomeSubmit = async (e) => {
     e.preventDefault()
     const { error } = await supabase.from('income').insert([
@@ -117,7 +112,6 @@ export default function Home() {
     }
   }
 
-  // HANDLE Savings submit
   const handleSavingsSubmit = async (e) => {
     e.preventDefault()
     const { error } = await supabase.from('savings').insert([
@@ -138,7 +132,6 @@ export default function Home() {
     }
   }
 
-  // HANDLE Pensions submit
   const handlePensionsSubmit = async (e) => {
     e.preventDefault()
     const { error } = await supabase.from('pensions').insert([
@@ -159,7 +152,6 @@ export default function Home() {
     }
   }
 
-  // HANDLE Run Simulation
   const handleRunSimulation = async () => {
     setSimulationRunning(true)
 
@@ -193,7 +185,7 @@ export default function Home() {
     setSimulationRunning(false)
   }
 
-  // RETURN UI
+  // 🚀 RETURN kommer i DEL 2!
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Hello, FutureWealth-ALPHA!</h1>
@@ -337,38 +329,6 @@ export default function Home() {
       <hr />
 
       <h2>📊 Simulations History</h2>
-
-{simulationsData.length > 0 && (
-  <div>
-    <h3>Capital Over Time (Last Simulation):</h3>
-    <Line
-      data={{
-        labels: Object.keys(simulationsData[0].result_json.capitalByYear),
-        datasets: [
-          {
-            label: 'Capital',
-            data: Object.values(simulationsData[0].result_json.capitalByYear),
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            fill: true,
-            tension: 0.3,
-          },
-        ],
-      }}
-      options={{
-        responsive: true,
-        plugins: {
-          legend: { position: 'top' },
-          title: { display: true, text: 'Capital Build-up Until Retirement' },
-        },
-      }}
-    />
-  </div>
-)}
-
-
-
-
 
       {simulationsData.length > 0 && (
         <div>

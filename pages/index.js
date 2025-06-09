@@ -1,6 +1,28 @@
 import { supabase } from '../lib/supabaseClient'
 import { useEffect, useState } from 'react'
 
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+import { Line } from 'react-chartjs-2'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+)
+
 export default function Home() {
   const userId = 'c1b397fd-009e-4e68-92bc-30b42c0849d4'
 
@@ -74,6 +96,7 @@ export default function Home() {
     fetchPensions()
     fetchSimulations()
   }, [])
+
   // HANDLE Income submit
   const handleIncomeSubmit = async (e) => {
     e.preventDefault()
@@ -136,7 +159,7 @@ export default function Home() {
     }
   }
 
-  // HANDLE Run Simulation (with inputs)
+  // HANDLE Run Simulation
   const handleRunSimulation = async () => {
     setSimulationRunning(true)
 
@@ -314,6 +337,35 @@ export default function Home() {
       <hr />
 
       <h2>📊 Simulations History</h2>
+
+      {simulationsData.length > 0 && (
+        <div>
+          <h3>Capital Over Time (Last Simulation):</h3>
+          <Line
+            data={{
+              labels: Object.keys(simulationsData[0].result_json.capitalByYear),
+              datasets: [
+                {
+                  label: 'Capital',
+                  data: Object.values(simulationsData[0].result_json.capitalByYear),
+                  borderColor: 'rgba(75, 192, 192, 1)',
+                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                  fill: true,
+                  tension: 0.3,
+                },
+              ],
+            }}
+            options={{
+              responsive: true,
+              plugins: {
+                legend: { position: 'top' },
+                title: { display: true, text: 'Capital Build-up Until Retirement' },
+              },
+            }}
+          />
+        </div>
+      )}
+
       <h3>Simulations Records:</h3>
       <pre>{JSON.stringify(simulationsData, null, 2)}</pre>
     </div>

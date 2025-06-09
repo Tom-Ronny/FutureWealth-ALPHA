@@ -2,7 +2,7 @@ import { supabase } from '../lib/supabaseClient'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
-  const userId = 'YOUR_USER_UUID_HERE'
+  const userId = 'c1b397fd-009e-4e68-92bc-30b42c0849d4'
 
   // STATES for data
   const [incomeData, setIncomeData] = useState([])

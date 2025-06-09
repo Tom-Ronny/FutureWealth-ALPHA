@@ -2,25 +2,33 @@ import { supabase } from '../lib/supabaseClient'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
-  // For visning av income og savings
+  // User ID - BYTT til din user uuid
+  const userId = 'c1b397fd-009e-4e68-92bc-30b42c0849d4'
+
+  // STATES for visning av data
   const [incomeData, setIncomeData] = useState([])
   const [savingsData, setSavingsData] = useState([])
+  const [pensionsData, setPensionsData] = useState([])
+  const [simulationsData, setSimulationsData] = useState([])
 
-  // For forms (income)
+  // STATES for Income form
   const [monthlyIncome, setMonthlyIncome] = useState('')
   const [incomeStartDate, setIncomeStartDate] = useState('')
   const [incomeEndDate, setIncomeEndDate] = useState('')
 
-  // For forms (savings)
+  // STATES for Savings form
   const [savingType, setSavingType] = useState('')
   const [monthlyAmount, setMonthlyAmount] = useState('')
   const [savingStartDate, setSavingStartDate] = useState('')
   const [savingEndDate, setSavingEndDate] = useState('')
 
-  // Bruker-id (BYTT UT med din user UUID fra users-tabellen)
-  const userId = 'c1b397fd-009e-4e68-92bc-30b42c0849d4'
+  // STATES for Pensions form
+  const [pensionType, setPensionType] = useState('')
+  const [annualAmount, setAnnualAmount] = useState('')
+  const [startAge, setStartAge] = useState('')
+  const [endAge, setEndAge] = useState('')
 
-  // Fetch income
+  // FETCH Income
   useEffect(() => {
     async function fetchIncome() {
       let { data, error } = await supabase
@@ -35,7 +43,7 @@ export default function Home() {
     fetchIncome()
   }, [])
 
-  // Fetch savings
+  // FETCH Savings
   useEffect(() => {
     async function fetchSavings() {
       let { data, error } = await supabase
@@ -50,7 +58,38 @@ export default function Home() {
     fetchSavings()
   }, [])
 
-  // Submit income
+  // FETCH Pensions
+  useEffect(() => {
+    async function fetchPensions() {
+      let { data, error } = await supabase
+        .from('pensions')
+        .select('*')
+        .eq('user_id', userId)
+
+      if (error) console.error('Error fetching pensions:', error)
+      else setPensionsData(data)
+    }
+
+    fetchPensions()
+  }, [])
+
+  // FETCH Simulations
+  useEffect(() => {
+    async function fetchSimulations() {
+      let { data, error } = await supabase
+        .from('simulations')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+
+      if (error) console.error('Error fetching simulations:', error)
+      else setSimulationsData(data)
+    }
+
+    fetchSimulations()
+  }, [])
+
+  // HANDLE Income submit
   const handleIncomeSubmit = async (e) => {
     e.preventDefault()
     const { error } = await supabase.from('income').insert([
@@ -70,7 +109,7 @@ export default function Home() {
     }
   }
 
-  // Submit savings
+  // HANDLE Savings submit
   const handleSavingsSubmit = async (e) => {
     e.preventDefault()
     const { error } = await supabase.from('savings').insert([
@@ -91,10 +130,32 @@ export default function Home() {
     }
   }
 
+  // HANDLE Pensions submit
+  const handlePensionsSubmit = async (e) => {
+    e.preventDefault()
+    const { error } = await supabase.from('pensions').insert([
+      {
+        user_id: userId,
+        pension_type: pensionType,
+        annual_amount: annualAmount,
+        start_age: startAge,
+        end_age: endAge,
+      },
+    ])
+
+    if (error) {
+      console.error('Error inserting pensions:', error)
+    } else {
+      alert('Pension saved!')
+      window.location.reload()
+    }
+  }
+
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Hello, FutureWealth-ALPHA!</h1>
 
+      {/* Income */}
       <h2>💰 Add Income</h2>
       <form onSubmit={handleIncomeSubmit}>
         <input
@@ -126,6 +187,7 @@ export default function Home() {
 
       <hr />
 
+      {/* Savings */}
       <h2>💸 Add Savings</h2>
       <form onSubmit={handleSavingsSubmit}>
         <input
@@ -162,8 +224,55 @@ export default function Home() {
 
       <h3>Savings Records:</h3>
       <pre>{JSON.stringify(savingsData, null, 2)}</pre>
+
+      <hr />
+
+      {/* Pensions */}
+      <h2>🏦 Add Pension</h2>
+      <form onSubmit={handlePensionsSubmit}>
+        <input
+          type="text"
+          placeholder="Pension Type"
+          value={pensionType}
+          onChange={(e) => setPensionType(e.target.value)}
+          required
+        />
+        <br />
+        <input
+          type="number"
+          placeholder="Annual Amount"
+          value={annualAmount}
+          onChange={(e) => setAnnualAmount(e.target.value)}
+          required
+        />
+        <br />
+        <input
+          type="number"
+          placeholder="Start Age"
+          value={startAge}
+          onChange={(e) => setStartAge(e.target.value)}
+          required
+        />
+        <br />
+        <input
+          type="number"
+          placeholder="End Age"
+          value={endAge}
+          onChange={(e) => setEndAge(e.target.value)}
+        />
+        <br />
+        <button type="submit">Save Pension</button>
+      </form>
+
+      <h3>Pension Records:</h3>
+      <pre>{JSON.stringify(pensionsData, null, 2)}</pre>
+
+      <hr />
+
+      {/* Simulations */}
+      <h2>📊 Simulations History</h2>
+      <h3>Simulations Records:</h3>
+      <pre>{JSON.stringify(simulationsData, null, 2)}</pre>
     </div>
   )
 }
-
-
